@@ -1,0 +1,32 @@
+{
+  "name": "opencode-antigravity-quota",
+  "version": "0.1.0",
+  "description": "Display Antigravity rate limit status after each tool execution in OpenCode TUI",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.0.0"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.1.7",
+    "@types/node": "^25.0.3",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "antigravity",
+    "quota",
+    "rate-limit"
+  ],
+  "author": "",
+  "license": "MIT"
+}
