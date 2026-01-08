@@ -35,12 +35,13 @@ function isValidAccountsFile(data: unknown): data is AntigravityAccountsFile {
   return (
     typeof obj.version === "number" &&
     Array.isArray(obj.accounts) &&
-    (obj.accounts.length === 0 ||
-      (typeof obj.accounts[0] === "object" &&
-        obj.accounts[0] !== null &&
-        "rateLimitResetTimes" in obj.accounts[0] &&
-        typeof (obj.accounts[0] as Record<string, unknown>).rateLimitResetTimes !==
-          "undefined")) &&
+    obj.accounts.every(
+      (account) =>
+        typeof account === "object" &&
+        account !== null &&
+        "rateLimitResetTimes" in account &&
+        typeof (account as Record<string, unknown>).rateLimitResetTimes !== "undefined"
+    ) &&
     typeof obj.activeIndex === "number"
   );
 }
