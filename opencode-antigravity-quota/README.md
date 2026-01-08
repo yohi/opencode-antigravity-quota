@@ -13,7 +13,7 @@ OpenCode TUI plugin to display Antigravity rate limit status after each tool exe
 
 ```bash
 # Clone or copy this directory
-git clone https://github.com/your-repo/opencode-antigravity-quota
+git clone https://github.com/yohi/opencode-antigravity-quota
 
 # Install dependencies
 cd opencode-antigravity-quota
