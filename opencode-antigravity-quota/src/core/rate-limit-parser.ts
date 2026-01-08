@@ -39,7 +39,7 @@ function parseModelFamilyFromKey(key: string): ModelFamily | null {
     return "gemini-flash";
   }
 
-  if (lower.includes("gemini") || lower.includes("pro")) {
+  if (lower.includes("gemini-pro") || (lower.includes("gemini") && lower.includes("pro"))) {
     return "gemini-pro";
   }
 
