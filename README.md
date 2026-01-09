@@ -33,9 +33,13 @@ Add to your `~/.config/opencode/opencode.jsonc`:
 }
 ```
 
-### Option 2: Git URL Workaround (Experimental)
+### Option 2: Git URL Method (Experimental / Future)
 
-⚠️ **This is an unofficial workaround and may not work in all OpenCode versions.**
+⚠️ **Current Status:**
+- Works in simple cases with current OpenCode versions
+- **Full official support coming in a future OpenCode release** with improved parsing
+- May fail if URL contains `@` character (e.g., authentication URLs)
+- For production use, **Option 1 (file://) is recommended** until the OpenCode update is released
 
 Add to your config:
 
@@ -49,7 +53,7 @@ Add to your config:
 }
 ```
 
-Note: This uses a non-standard format that exploits `bun add`'s version specifier parsing. Official support is not guaranteed.
+**After OpenCode update:** This format will be fully supported with robust URL parsing and clear error messages.
 
 ### Option 3: Local Path
 
