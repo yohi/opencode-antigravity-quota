@@ -1,3 +1,4 @@
+import type { PluginInput } from "@opencode-ai/plugin";
 import { loadAccounts } from "../core/accounts-reader.js";
 import { parseRateLimits } from "../core/rate-limit-parser.js";
 import { formatCompactQuotaStatus } from "../ui/compact-formatter.js";
@@ -14,11 +15,11 @@ interface ToolExecuteOutput {
   metadata: unknown;
 }
 
-export function createQuotaDisplayHook() {
+export function createQuotaDisplayHook(client: PluginInput["client"]) {
   return {
     "tool.execute.after": async (
       _input: ToolExecuteInput,
-      output: ToolExecuteOutput
+      _output: ToolExecuteOutput
     ): Promise<void> => {
       try {
         const accounts = await loadAccounts();
@@ -36,16 +37,15 @@ export function createQuotaDisplayHook() {
         }
 
         const quotas = parseRateLimits(activeAccount);
-        const hasAnyRateLimit = Array.from(quotas.values()).some(
-          (q) => q.status === "rate-limited"
-        );
-
-        if (!hasAnyRateLimit) {
-          return;
-        }
-
         const formatted = formatCompactQuotaStatus(quotas);
-        output.output += `\n\n${formatted}`;
+        await client.tui.showToast({
+          body: {
+            title: "Antigravity",
+            message: formatted,
+            variant: "info",
+            duration: 4000,
+          },
+        });
       } catch {
         return;
       }
