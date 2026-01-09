@@ -1,0 +1,1 @@
+{"version":3,"file":"rate-limit-parser.d.ts","sourceRoot":"","sources":["../../src/core/rate-limit-parser.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,WAAW,EAAE,cAAc,EAAE,WAAW,EAAE,MAAM,YAAY,CAAC;AAE3E,wBAAgB,eAAe,CAAC,OAAO,EAAE,WAAW,GAAG,GAAG,CAAC,WAAW,EAAE,cAAc,CAAC,CA0BtF"}
