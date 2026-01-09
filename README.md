@@ -11,21 +11,30 @@ OpenCode TUI plugin to display Antigravity rate limit status after each tool exe
 
 ## Installation
 
-```bash
-# Clone or copy this directory
-git clone https://github.com/yohi/opencode-antigravity-quota
-
-# Install dependencies
-cd opencode-antigravity-quota
-npm install
-
-# Build
-npm run build
-```
-
-## Configuration
+**Option 1: Direct from Git (Recommended)**
 
 Add to your `~/.config/opencode/opencode.jsonc`:
+
+```json
+{
+  "plugin": [
+    "oh-my-opencode",
+    "opencode-antigravity-auth@beta",
+    "git+https://github.com/yohi/opencode-antigravity-quota"
+  ]
+}
+```
+
+The plugin will be automatically installed on OpenCode startup. No manual cloning or building required.
+
+**Option 2: Local Installation**
+
+```bash
+# Clone the repository
+git clone https://github.com/yohi/opencode-antigravity-quota
+```
+
+Then add to your config:
 
 ```json
 {
@@ -36,6 +45,8 @@ Add to your `~/.config/opencode/opencode.jsonc`:
   ]
 }
 ```
+
+Note: The repository includes pre-built files in `dist/`, so no build step is required.
 
 ## Display Format
 
