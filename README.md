@@ -11,7 +11,15 @@ OpenCode TUI plugin to display Antigravity rate limit status after each tool exe
 
 ## Installation
 
-**Option 1: Direct from Git (Recommended)**
+The repository includes pre-built files in `dist/`, so **no build step is required** for any installation method.
+
+### Option 1: Local Clone with file:// (Recommended)
+
+Clone to your OpenCode config directory:
+
+```bash
+git clone https://github.com/yohi/opencode-antigravity-quota ~/.config/opencode/opencode-antigravity-quota
+```
 
 Add to your `~/.config/opencode/opencode.jsonc`:
 
@@ -20,21 +28,38 @@ Add to your `~/.config/opencode/opencode.jsonc`:
   "plugin": [
     "oh-my-opencode",
     "opencode-antigravity-auth@beta",
-    "git+https://github.com/yohi/opencode-antigravity-quota"
+    "file://~/.config/opencode/opencode-antigravity-quota"
   ]
 }
 ```
 
-The plugin will be automatically installed on OpenCode startup. No manual cloning or building required.
+### Option 2: Git URL Workaround (Experimental)
 
-**Option 2: Local Installation**
+⚠️ **This is an unofficial workaround and may not work in all OpenCode versions.**
 
-```bash
-# Clone the repository
-git clone https://github.com/yohi/opencode-antigravity-quota
+Add to your config:
+
+```json
+{
+  "plugin": [
+    "oh-my-opencode",
+    "opencode-antigravity-auth@beta",
+    "opencode-antigravity-quota@git+https://github.com/yohi/opencode-antigravity-quota"
+  ]
+}
 ```
 
-Then add to your config:
+Note: This uses a non-standard format that exploits `bun add`'s version specifier parsing. Official support is not guaranteed.
+
+### Option 3: Local Path
+
+Clone to any location:
+
+```bash
+git clone https://github.com/yohi/opencode-antigravity-quota /path/to/opencode-antigravity-quota
+```
+
+Add to your config:
 
 ```json
 {
@@ -45,8 +70,6 @@ Then add to your config:
   ]
 }
 ```
-
-Note: The repository includes pre-built files in `dist/`, so no build step is required.
 
 ## Display Format
 
