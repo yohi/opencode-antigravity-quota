@@ -66,6 +66,8 @@ export async function runOAuthFlow(): Promise<StoredCredential> {
 
 async function buildAuthorizationUrl(state: string): Promise<string> {
   const { clientId } = await getOAuthCredentials();
+  
+  // URLSearchParamsが自動的にエンコード処理を行うため、ここではraw値を渡す
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: REDIRECT_URI,
@@ -73,7 +75,7 @@ async function buildAuthorizationUrl(state: string): Promise<string> {
     scope: SCOPES.join(" "),
     access_type: "offline",
     prompt: "consent",
-    state,
+    state: state,
   });
 
   return `https://accounts.google.com/o/oauth2/auth?${params.toString()}`;
@@ -132,6 +134,7 @@ async function exchangeAuthorizationCode(code: string): Promise<{
 }> {
   const { clientId, clientSecret } = await getOAuthCredentials();
   
+  // URLSearchParamsが自動的にエンコード処理を行うため、ここではraw値を渡す
   const response = await fetch(TOKEN_URL, {
     method: "POST",
     headers: {
@@ -140,7 +143,7 @@ async function exchangeAuthorizationCode(code: string): Promise<{
     body: new URLSearchParams({
       client_id: clientId,
       client_secret: clientSecret,
-      code,
+      code: code,
       redirect_uri: REDIRECT_URI,
       grant_type: "authorization_code",
     }).toString(),

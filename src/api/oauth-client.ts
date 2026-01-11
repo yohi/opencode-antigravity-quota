@@ -14,6 +14,9 @@ export async function refreshAccessToken(refreshToken: string): Promise<string> 
 
   const { clientId, clientSecret } = await getOAuthCredentials();
 
+  // URLSearchParamsが自動的にエンコード処理を行うため、ここではraw値を渡す
+  // 以前の明示的なencodeURIComponentは二重エンコードの原因となるため削除
+
   const response = await fetch(TOKEN_URL, {
     method: "POST",
     headers: {
