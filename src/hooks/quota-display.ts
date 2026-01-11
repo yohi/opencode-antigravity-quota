@@ -2,6 +2,7 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { loadAccounts } from "../core/accounts-reader.js";
 import { parseRateLimits } from "../core/rate-limit-parser.js";
 import { formatCompactQuotaStatus } from "../ui/compact-formatter.js";
+import { fetchQuotaWithCache } from "../api/quota-fetcher.js";
 
 interface ToolExecuteInput {
   tool: string;
@@ -42,7 +43,17 @@ export function createQuotaDisplayHook(client: PluginInput["client"]) {
         return;
       }
 
-      const quotas = parseRateLimits(activeAccount);
+      const localQuotas = parseRateLimits(activeAccount);
+      const apiQuotas = await fetchQuotaWithCache(activeAccount);
+
+      // ローカルの情報をベースに、APIから取得できた情報があれば上書きマージする
+      const quotas = new Map(localQuotas);
+      if (apiQuotas) {
+        for (const [family, info] of apiQuotas) {
+          quotas.set(family, info);
+        }
+      }
+
       const formatted = formatCompactQuotaStatus(quotas);
       client.tui.showToast({
         body: {

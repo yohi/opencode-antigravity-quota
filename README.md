@@ -4,9 +4,9 @@ OpenCode TUI plugin to display Antigravity rate limit status after each tool exe
 
 ## Features
 
-- Displays rate limit status for Claude, Gemini Pro, and Gemini Flash models
-- Compact format: `[AG] Claude:✅ | Pro:⏳12m | Flash:✅`
-- Only shows when rate limits are active
+- Displays quota percentage for Claude, Gemini Pro, and Gemini Flash models
+- Compact format: `[AG] Claude:80%🔋 | Pro:35%🔋 | Flash:🪫0%`
+- Falls back to rate limit display if the API fails
 - Reads from `~/.config/opencode/antigravity-accounts.json`
 
 ## Installation
@@ -79,13 +79,59 @@ Add to your config:
 
 | Status | Display |
 |--------|---------|
-| Available | `Model:✅` |
-| Rate Limited | `Model:⏳{time}` |
+| Healthy | `Model:80%🔋` |
+| Low (<=20%) | `Model:15%⚠️` |
+| Empty | `Model:🪫0%` |
+| Rate limited (local) | `Model:⏳{time}` |
+| Unknown (API error) | `Model:??` |
 
-Time format examples:
+Time format examples (rate limited):
 - `12m` - 12 minutes
 - `1h30m` - 1 hour 30 minutes
 - `2h` - 2 hours
+
+## Authentication
+
+### ⚠️ Security Warning
+
+**The OAuth client secret was previously hardcoded in this repository and has been exposed.**
+
+**Required Actions:**
+1. **Rotate the secret** in [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new OAuth 2.0 Client ID or regenerate the secret
+3. Set up environment variables (see below)
+
+**Never commit `.env` files containing secrets to version control.**
+
+### Setup OAuth Credentials
+
+Claude など API 由来の正確なクォータ表示には OAuth 認証が必要です。
+
+1. **Get OAuth credentials** from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - Create or use an existing OAuth 2.0 Client ID
+   - Download the credentials or copy `client_id` and `client_secret`
+
+2. **Create `.env` file** in the project root:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Add your credentials** to `.env`:
+   ```bash
+   OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
+   OAUTH_CLIENT_SECRET=your-client-secret
+   ```
+
+4. **Run authentication**:
+   ```bash
+   # In OpenCode
+   ag-login
+   ```
+
+5. 表示されたURLをブラウザで開く
+6. `localhost:11451` のコールバックが完了すると認証完了
+
+認証情報は `~/.config/opencode/antigravity-auth.json` に保存されます。
 
 ## Requirements
 
