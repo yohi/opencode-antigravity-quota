@@ -160,12 +160,18 @@ Claude など API 由来の正確なクォータ表示には OAuth 認証が必�
 
 #### 2. 環境変数ファイルを作成
 
-**npmパッケージとしてインストールした場合** (GitHub Packages):
+プラグインは以下の場所から環境変数ファイルを優先順位順に読み込みます:
+
+1. `~/.config/opencode/antigravity-quota.env` (推奨 - すべてのインストール方法で使用可能)
+2. プロジェクトディレクトリの `.env` (ローカルクローンの場合)
+
+**推奨**: どのインストール方法でも `~/.config/opencode/antigravity-quota.env` を使用してください。
+
 ```bash
 nano ~/.config/opencode/antigravity-quota.env
 ```
 
-**ローカルクローンの場合** (file:// または絶対パス):
+**ローカルクローンの場合の代替方法**:
 ```bash
 cd ~/.config/opencode/opencode-antigravity-quota
 cp .env.example .env
@@ -179,10 +185,6 @@ nano .env
 OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
 OAUTH_CLIENT_SECRET=your-client-secret
 ```
-
-**注意**: 
-- npmパッケージの場合: `~/.config/opencode/antigravity-quota.env`
-- ローカルクローンの場合: プロジェクトディレクトリの `.env`
 
 #### 4. 認証を実行
 
@@ -199,11 +201,11 @@ ag-login
 
 #### トラブルシューティング
 
-**エラー: "OAuth credentials not found"**
+##### エラー: "OAuth credentials not found"
 
-環境変数ファイルが正しい場所にあるか確認:
-- npmパッケージ: `~/.config/opencode/antigravity-quota.env`
-- ローカル: `プロジェクトディレクトリ/.env`
+環境変数ファイルが以下のいずれかの場所にあるか確認:
+1. `~/.config/opencode/antigravity-quota.env` (推奨)
+2. プロジェクトディレクトリの `.env` (ローカルクローンの場合)
 
 ファイル内容の形式が正しいか確認:
 ```bash
@@ -211,7 +213,7 @@ ag-login
 OAUTH_CLIENT_ID=123456.apps.googleusercontent.com
 OAUTH_CLIENT_SECRET=GOCSPX-abc123
 
-# 間違った形式（クォートは不要）
+# 間違った形式(クォートは不要)
 OAUTH_CLIENT_ID="123456.apps.googleusercontent.com"
 ```
 
