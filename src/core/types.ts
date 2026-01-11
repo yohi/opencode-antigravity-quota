@@ -7,6 +7,9 @@ export interface ModelQuotaInfo {
   family: ModelFamily;
   status: QuotaStatus;
   remainingPercentage?: number;
+  resetTime?: Date;
+  timeUntilResetMs?: number;
+  resetTimeValid?: boolean;
   resetTimeMs?: number;
   remainingMs?: number;
 }

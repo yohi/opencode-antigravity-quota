@@ -6,19 +6,23 @@ const FAMILY_DISPLAY_NAMES = {
 const DISPLAY_ORDER = ["claude", "gemini-pro", "gemini-flash"];
 export function formatCompactQuotaStatus(quotas) {
     const parts = [];
+    const maxLabelLength = Math.max(...DISPLAY_ORDER.map((family) => FAMILY_DISPLAY_NAMES[family].length));
     for (const family of DISPLAY_ORDER) {
         const info = quotas.get(family);
-        const label = FAMILY_DISPLAY_NAMES[family];
-        parts.push(`${label}:${formatQuotaIndicator(info)}`);
+        const label = FAMILY_DISPLAY_NAMES[family].padEnd(maxLabelLength);
+        parts.push(`${label}: ${formatQuotaIndicator(info)}`);
     }
-    return `[AG] ${parts.join(" | ")}`;
+    return `[AG]\n${parts.join("\n")}`;
 }
 function formatQuotaIndicator(info) {
     if (!info) {
         return "??";
     }
     if (info.remainingPercentage !== undefined) {
-        return formatPercentage(info.remainingPercentage);
+        const percentageDisplay = formatPercentage(info.remainingPercentage);
+        const resetDisplay = formatResetDisplay(info);
+        const emphasis = shouldEmphasizeEmpty(info.remainingPercentage) ? "⚡" : "";
+        return `${percentageDisplay}${resetDisplay}${emphasis}`;
     }
     if (info.status === "rate-limited") {
         const remaining = formatRemainingTime(info.remainingMs ?? 0);
@@ -38,6 +42,19 @@ function formatPercentage(value) {
         return `${percentage}%⚠️`;
     }
     return `${percentage}%🔋`;
+}
+function formatResetDisplay(info) {
+    if (info.resetTimeValid === false) {
+        return "(↻??)";
+    }
+    if (info.timeUntilResetMs === undefined) {
+        return "(↻??)";
+    }
+    const remaining = formatRemainingTime(info.timeUntilResetMs);
+    return `(↻${remaining})`;
+}
+function shouldEmphasizeEmpty(value) {
+    return Math.round(value) <= 0;
 }
 function formatRemainingTime(ms) {
     if (ms <= 0) {

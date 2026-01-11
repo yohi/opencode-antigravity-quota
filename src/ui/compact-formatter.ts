@@ -12,14 +12,17 @@ export function formatCompactQuotaStatus(
   quotas: Map<ModelFamily, ModelQuotaInfo>
 ): string {
   const parts: string[] = [];
+  const maxLabelLength = Math.max(
+    ...DISPLAY_ORDER.map((family) => FAMILY_DISPLAY_NAMES[family].length)
+  );
 
   for (const family of DISPLAY_ORDER) {
     const info = quotas.get(family);
-    const label = FAMILY_DISPLAY_NAMES[family];
-    parts.push(`${label}:${formatQuotaIndicator(info)}`);
+    const label = FAMILY_DISPLAY_NAMES[family].padEnd(maxLabelLength);
+    parts.push(`${label}: ${formatQuotaIndicator(info)}`);
   }
 
-  return `[AG] ${parts.join(" | ")}`;
+  return `[AG]\n${parts.join("\n")}`;
 }
 
 function formatQuotaIndicator(info?: ModelQuotaInfo): string {
@@ -28,7 +31,10 @@ function formatQuotaIndicator(info?: ModelQuotaInfo): string {
   }
 
   if (info.remainingPercentage !== undefined) {
-    return formatPercentage(info.remainingPercentage);
+    const percentageDisplay = formatPercentage(info.remainingPercentage);
+    const resetDisplay = formatResetDisplay(info);
+    const emphasis = shouldEmphasizeEmpty(info.remainingPercentage) ? "⚡" : "";
+    return `${percentageDisplay}${resetDisplay}${emphasis}`;
   }
 
   if (info.status === "rate-limited") {
@@ -55,6 +61,23 @@ function formatPercentage(value: number): string {
   }
 
   return `${percentage}%🔋`;
+}
+
+function formatResetDisplay(info: ModelQuotaInfo): string {
+  if (info.resetTimeValid === false) {
+    return "(↻??)";
+  }
+
+  if (info.timeUntilResetMs === undefined) {
+    return "(↻??)";
+  }
+
+  const remaining = formatRemainingTime(info.timeUntilResetMs);
+  return `(↻${remaining})`;
+}
+
+function shouldEmphasizeEmpty(value: number): boolean {
+  return Math.round(value) <= 0;
 }
 
 function formatRemainingTime(ms: number): string {
