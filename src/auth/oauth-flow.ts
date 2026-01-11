@@ -67,19 +67,15 @@ export async function runOAuthFlow(): Promise<StoredCredential> {
 async function buildAuthorizationUrl(state: string): Promise<string> {
   const { clientId } = await getOAuthCredentials();
   
-  const encodedClientId = encodeURIComponent(clientId);
-  const encodedRedirectUri = encodeURIComponent(REDIRECT_URI);
-  const encodedScope = encodeURIComponent(SCOPES.join(" "));
-  const encodedState = encodeURIComponent(state);
-  
+  // URLSearchParamsが自動的にエンコード処理を行うため、ここではraw値を渡す
   const params = new URLSearchParams({
-    client_id: encodedClientId,
-    redirect_uri: encodedRedirectUri,
+    client_id: clientId,
+    redirect_uri: REDIRECT_URI,
     response_type: "code",
-    scope: encodedScope,
+    scope: SCOPES.join(" "),
     access_type: "offline",
     prompt: "consent",
-    state: encodedState,
+    state: state,
   });
 
   return `https://accounts.google.com/o/oauth2/auth?${params.toString()}`;
@@ -138,21 +134,17 @@ async function exchangeAuthorizationCode(code: string): Promise<{
 }> {
   const { clientId, clientSecret } = await getOAuthCredentials();
   
-  const encodedClientId = encodeURIComponent(clientId);
-  const encodedClientSecret = encodeURIComponent(clientSecret);
-  const encodedCode = encodeURIComponent(code);
-  const encodedRedirectUri = encodeURIComponent(REDIRECT_URI);
-  
+  // URLSearchParamsが自動的にエンコード処理を行うため、ここではraw値を渡す
   const response = await fetch(TOKEN_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({
-      client_id: encodedClientId,
-      client_secret: encodedClientSecret,
-      code: encodedCode,
-      redirect_uri: encodedRedirectUri,
+      client_id: clientId,
+      client_secret: clientSecret,
+      code: code,
+      redirect_uri: REDIRECT_URI,
       grant_type: "authorization_code",
     }).toString(),
   });
