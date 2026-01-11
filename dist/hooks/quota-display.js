@@ -7,6 +7,9 @@ export function createQuotaDisplayHook(client) {
             if (!client?.tui?.showToast) {
                 return;
             }
+            if (input.tool === "ag-status") {
+                return;
+            }
             const accounts = await loadAccounts();
             if (!accounts || accounts.accounts.length === 0) {
                 return;
@@ -18,12 +21,10 @@ export function createQuotaDisplayHook(client) {
             }
             const quotas = parseRateLimits(activeAccount);
             const formatted = formatCompactQuotaStatus(quotas);
-            await client.tui.showToast({
+            client.tui.showToast({
                 body: {
-                    title: "Antigravity",
                     message: formatted,
                     variant: "info",
-                    duration: 4000,
                 },
             });
         }
