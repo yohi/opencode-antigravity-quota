@@ -1,14 +1,16 @@
 import type { Plugin } from "@opencode-ai/plugin";
-import { tool } from "@opencode-ai/plugin/tool";
+import { tool, type ToolContext } from "@opencode-ai/plugin/tool";
 import { createQuotaDisplayHook } from "./hooks/quota-display.js";
 import { loadAccounts } from "./core/accounts-reader.js";
 import { parseRateLimits } from "./core/rate-limit-parser.js";
 import { formatCompactQuotaStatus } from "./ui/compact-formatter.js";
 
+type EmptyArgs = Record<string, never>;
+
 const agStatusTool = tool({
   description: "Show Antigravity quota status for current account",
   args: {},
-  execute: async (_args, _context) => {
+  execute: async (_args: EmptyArgs, _context: ToolContext) => {
     const accounts = await loadAccounts();
     if (!accounts || accounts.accounts.length === 0) {
       return "No Antigravity accounts found.";
@@ -28,11 +30,11 @@ const agStatusTool = tool({
   },
 });
 
-const AntigravityQuotaPlugin: Plugin = async () => {
-  const quotaDisplay = createQuotaDisplayHook();
+const AntigravityQuotaPlugin: Plugin = async ({ client }) => {
+  const quotaDisplay = createQuotaDisplayHook(client);
 
   return {
-    "tool.execute.after": quotaDisplay["tool.execute.after"],
+    "tool.execute.after": quotaDisplay,
     tool: {
       "ag-status": agStatusTool,
     },

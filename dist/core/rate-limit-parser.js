@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseRateLimits = parseRateLimits;
-function parseRateLimits(account) {
+export function parseRateLimits(account) {
     const result = new Map();
     const now = Date.now();
     const families = ["claude", "gemini-flash", "gemini-pro"];

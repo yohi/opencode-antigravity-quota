@@ -1,3 +1,4 @@
+import type { PluginInput } from "@opencode-ai/plugin";
 interface ToolExecuteInput {
     tool: string;
     sessionID: string;
@@ -8,8 +9,6 @@ interface ToolExecuteOutput {
     output: string;
     metadata: unknown;
 }
-export declare function createQuotaDisplayHook(): {
-    "tool.execute.after": (_input: ToolExecuteInput, output: ToolExecuteOutput) => Promise<void>;
-};
+export declare function createQuotaDisplayHook(client: PluginInput["client"]): (input: ToolExecuteInput, _output: ToolExecuteOutput) => Promise<void>;
 export {};
 //# sourceMappingURL=quota-display.d.ts.map

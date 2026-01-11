@@ -16,39 +16,41 @@ interface ToolExecuteOutput {
 }
 
 export function createQuotaDisplayHook(client: PluginInput["client"]) {
-  return {
-    "tool.execute.after": async (
-      _input: ToolExecuteInput,
-      _output: ToolExecuteOutput
-    ): Promise<void> => {
-      try {
-        const accounts = await loadAccounts();
-        if (!accounts || accounts.accounts.length === 0) {
-          return;
-        }
-
-        const activeIndex = Math.max(
-          0,
-          Math.min(accounts.activeIndex, accounts.accounts.length - 1)
-        );
-        const activeAccount = accounts.accounts[activeIndex];
-        if (!activeAccount) {
-          return;
-        }
-
-        const quotas = parseRateLimits(activeAccount);
-        const formatted = formatCompactQuotaStatus(quotas);
-        await client.tui.showToast({
-          body: {
-            title: "Antigravity",
-            message: formatted,
-            variant: "info",
-            duration: 4000,
-          },
-        });
-      } catch {
+  return async (
+    input: ToolExecuteInput,
+    _output: ToolExecuteOutput
+  ): Promise<void> => {
+    try {
+      if (!client?.tui?.showToast) {
         return;
       }
-    },
+
+      const accounts = await loadAccounts();
+      if (!accounts || accounts.accounts.length === 0) {
+        return;
+      }
+
+      const activeIndex = Math.max(
+        0,
+        Math.min(accounts.activeIndex, accounts.accounts.length - 1)
+      );
+      const activeAccount = accounts.accounts[activeIndex];
+      if (!activeAccount) {
+        return;
+      }
+
+      const quotas = parseRateLimits(activeAccount);
+      const formatted = formatCompactQuotaStatus(quotas);
+      await client.tui.showToast({
+        body: {
+          title: "Antigravity",
+          message: formatted,
+          variant: "info",
+          duration: 4000,
+        },
+      });
+    } catch {
+      return;
+    }
   };
 }

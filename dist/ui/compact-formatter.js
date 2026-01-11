@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.formatCompactQuotaStatus = formatCompactQuotaStatus;
 const FAMILY_DISPLAY_NAMES = {
     claude: "Claude",
     "gemini-pro": "Pro",
     "gemini-flash": "Flash",
 };
 const DISPLAY_ORDER = ["claude", "gemini-pro", "gemini-flash"];
-function formatCompactQuotaStatus(quotas) {
+export function formatCompactQuotaStatus(quotas) {
     const parts = [];
     for (const family of DISPLAY_ORDER) {
         const info = quotas.get(family);
