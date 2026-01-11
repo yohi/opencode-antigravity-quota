@@ -27,7 +27,7 @@ export function formatCompactQuotaStatus(
 
 function formatQuotaIndicator(info?: ModelQuotaInfo): string {
   if (!info) {
-    return "??";
+    return "  ??   ";
   }
 
   if (info.remainingPercentage !== undefined) {
@@ -42,7 +42,11 @@ function formatQuotaIndicator(info?: ModelQuotaInfo): string {
     return `⏳${remaining}`;
   }
 
-  return "??";
+  if (info.status === "available") {
+    return "  OK   ";
+  }
+
+  return "  ??   ";
 }
 
 function formatPercentage(value: number): string {
