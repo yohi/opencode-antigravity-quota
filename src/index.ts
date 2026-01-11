@@ -5,6 +5,7 @@ import { loadAccounts } from "./core/accounts-reader.js";
 import { parseRateLimits } from "./core/rate-limit-parser.js";
 import { formatCompactQuotaStatus } from "./ui/compact-formatter.js";
 import { fetchQuotaWithCache } from "./api/quota-fetcher.js";
+import { runOAuthFlow } from "./auth/oauth-flow.js";
 
 type EmptyArgs = Record<string, never>;
 
@@ -48,12 +49,30 @@ const agStatusTool = tool({
   },
 });
 
+const agLoginTool = tool({
+  description: "Authenticate with Antigravity to fetch quota details",
+  args: {},
+  execute: async (_args: EmptyArgs, _context: ToolContext) => {
+    try {
+      const credential = await runOAuthFlow();
+      const emailInfo = credential.email ? ` (${credential.email})` : "";
+      return `Authentication completed${emailInfo}.`;
+    } catch (error) {
+      console.error("Failed to authenticate Antigravity account", error);
+      const errorDetail =
+        error instanceof Error && error.message ? `: ${error.message}` : "";
+      return `Failed to authenticate Antigravity account${errorDetail}`;
+    }
+  },
+});
+
 const AntigravityQuotaPlugin: Plugin = async ({ client }) => {
   const quotaDisplay = createQuotaDisplayHook(client);
 
   return {
     "tool.execute.after": quotaDisplay,
     tool: {
+      "ag-login": agLoginTool,
       "ag-status": agStatusTool,
     },
   };

@@ -90,6 +90,16 @@ Time format examples (rate limited):
 - `1h30m` - 1 hour 30 minutes
 - `2h` - 2 hours
 
+## Authentication
+
+Claude など API 由来の正確なクォータ表示には OAuth 認証が必要です。
+
+1. OpenCode で `ag-login` を実行
+2. 表示されたURLをブラウザで開く
+3. `localhost:11451` のコールバックが完了すると認証完了
+
+認証情報は `~/.config/opencode/antigravity-auth.json` に保存されます。
+
 ## Requirements
 
 - OpenCode v1.0.0+

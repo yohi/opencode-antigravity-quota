@@ -11,6 +11,18 @@ export interface RetrieveUserQuotaResponse {
   buckets?: BucketInfo[];
 }
 
+export interface AvailableModelInfo {
+  displayName?: string;
+  quotaInfo?: {
+    remainingFraction?: number;
+    resetTime?: string;
+  };
+}
+
+export interface FetchAvailableModelsResponse {
+  models?: Record<string, AvailableModelInfo>;
+}
+
 export interface QuotaCache {
   data: Map<ModelFamily, ModelQuotaInfo>;
   timestamp: number;
