@@ -79,21 +79,25 @@ function shouldEmphasizeEmpty(value: number): boolean {
 
 function formatRemainingTime(ms: number): string {
   if (ms <= 0) {
-    return "  0m";
+    return "  0m".padEnd(6);
   }
 
   const minutesTotal = Math.ceil(ms / 60000);
+  let text = "";
 
   if (minutesTotal < 60) {
-    return `${String(minutesTotal).padStart(3)}m`;
+    text = `${String(minutesTotal).padStart(3)}m`;
+  } else {
+    const hours = Math.floor(minutesTotal / 60);
+    const minutes = minutesTotal % 60;
+
+    if (minutes === 0) {
+      text = `${String(hours).padStart(2)}h`;
+    } else {
+      text = `${String(hours).padStart(2)}h${String(minutes).padStart(2)}m`;
+    }
   }
 
-  const hours = Math.floor(minutesTotal / 60);
-  const minutes = minutesTotal % 60;
-
-  if (minutes === 0) {
-    return `${String(hours).padStart(2)}h  `;
-  }
-
-  return `${String(hours).padStart(2)}h${String(minutes).padStart(2)}m`;
+  // Ensure consistent width (6 chars) for alignment
+  return text.padEnd(6);
 }

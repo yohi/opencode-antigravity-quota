@@ -18,7 +18,60 @@ const OH_MY_OPENCODE_PATH = join(
 );
 
 function stripJsonComments(json: string): string {
-  return json.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  let inString = false;
+  let inSingleLineComment = false;
+  let inMultiLineComment = false;
+  let escaped = false;
+  let result = "";
+
+  for (let i = 0; i < json.length; i++) {
+    const char = json[i];
+    const nextChar = json[i + 1];
+
+    if (inSingleLineComment) {
+      if (char === "\n" || char === "\r") {
+        inSingleLineComment = false;
+        result += char;
+      }
+      continue;
+    }
+
+    if (inMultiLineComment) {
+      if (char === "*" && nextChar === "/") {
+        inMultiLineComment = false;
+        i++; // Skip '/'
+      }
+      continue;
+    }
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      result += char;
+      continue;
+    }
+
+    // Not in string or comment
+    if (char === '"') {
+      inString = true;
+      result += char;
+    } else if (char === "/" && nextChar === "/") {
+      inSingleLineComment = true;
+      i++; // Skip second '/'
+    } else if (char === "/" && nextChar === "*") {
+      inMultiLineComment = true;
+      i++; // Skip '*'
+    } else {
+      result += char;
+    }
+  }
+
+  return result;
 }
 
 export async function loadAccounts(): Promise<AntigravityAccountsFile | null> {

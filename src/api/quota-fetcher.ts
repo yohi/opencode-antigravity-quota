@@ -7,7 +7,7 @@ import {
   saveStoredCredential,
 } from "../auth/token-storage.js";
 import { FetchAvailableModelsResponse, QuotaCache } from "./types.js";
-import { log } from "../utils/logger.js";
+import { log, maskIdentifier, sanitizeApiResponse } from "../utils/logger.js";
 
 
 const CACHE_TTL_MS = 30_000;
@@ -52,10 +52,10 @@ async function fetchQuotaFromCloudCode(
 
   if (userAccessToken) {
     const projectId = storedCredential?.projectId;
-    await log("Trying fetchAvailableModels with projectId:", projectId);
+    await log("Trying fetchAvailableModels with projectId:", maskIdentifier(projectId));
     try {
       const response = await fetchAvailableModels(userAccessToken, projectId);
-      await log("fetchAvailableModels response:", response);
+      await log("fetchAvailableModels response:", sanitizeApiResponse(response));
       const quotas = extractQuotaFromAvailableModels(response);
       if (quotas && quotas.size > 0) {
         await log("Got quotas from fetchAvailableModels:", quotas.size, "families");
@@ -75,9 +75,9 @@ async function fetchQuotaFromCloudCode(
   await log("Trying retrieveUserQuota flow");
   const accessToken = await refreshAccessToken(account.refreshToken);
   const projectId = account.managedProjectId ?? account.projectId;
-  await log("Trying retrieveUserQuota with projectId:", projectId);
+  await log("Trying retrieveUserQuota with projectId:", maskIdentifier(projectId));
   const response = await retrieveUserQuota(accessToken, projectId);
-  await log("retrieveUserQuota response:", response);
+  await log("retrieveUserQuota response:", sanitizeApiResponse(response));
 
   const result = new Map<ModelFamily, ModelQuotaInfo>();
   const buckets = response.buckets ?? [];
@@ -92,7 +92,7 @@ async function fetchQuotaFromCloudCode(
 
     const remainingFraction = clampFraction(bucket.remainingFraction);
     if (remainingFraction === null) {
-      await log("Skipping bucket with null remainingFraction:", bucket.modelId);
+      await log("Skipping bucket with null remainingFraction for model family");
       continue;
     }
 
