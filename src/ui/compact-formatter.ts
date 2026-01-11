@@ -50,7 +50,10 @@ function formatQuotaIndicator(info?: ModelQuotaInfo): string {
 }
 
 function formatPercentage(value: number): string {
-  const percentage = Math.round(value);
+  let percentage = Math.round(value);
+  // Clamp to 0-100 to avoid confusing display for out-of-range values
+  percentage = Math.min(100, Math.max(0, percentage));
+
   const paddedPercentage = String(percentage).padStart(3);
 
   if (percentage <= 0) {

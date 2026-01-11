@@ -1,7 +1,10 @@
 import { promises as fs } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { homedir } from "node:os";
+import { fileURLToPath } from "node:url";
 import { log } from "../utils/logger.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export interface OAuthCredentials {
   clientId: string;
@@ -12,7 +15,9 @@ export interface OAuthCredentials {
 const ENV_FILE_PATHS = [
   // 優先度1: ユーザー設定ディレクトリ (npm パッケージ推奨)
   join(homedir(), ".config", "opencode", "antigravity-quota.env"),
-  // 優先度2: このファイルからの相対パス (ローカルクローン用)
+  // 優先度2: 実行ディレクトリ (ローカル利用で直感的)
+  join(process.cwd(), ".env"),
+  // 優先度3: パッケージ基準 (ローカルクローン/ビルド成果物用)
   join(__dirname, "../..", ".env"),
 ];
 
@@ -32,16 +37,47 @@ async function loadEnvFile(): Promise<void> {
         const lines = content.split("\n");
         
         for (const line of lines) {
-          const trimmed = line.trim();
+          let trimmed = line.trim();
           if (!trimmed || trimmed.startsWith("#")) {
             continue;
           }
-          
-          const [key, ...valueParts] = trimmed.split("=");
-          if (key && valueParts.length > 0) {
-            const value = valueParts.join("=").trim();
-            process.env[key.trim()] = value;
+
+          // Handle "export " prefix common in shell scripts
+          if (trimmed.startsWith("export ")) {
+            trimmed = trimmed.slice(7).trim();
           }
+
+          const separatorIndex = trimmed.indexOf("=");
+          if (separatorIndex === -1) continue;
+
+          const key = trimmed.slice(0, separatorIndex).trim();
+          if (!key) continue;
+
+          // Do not overwrite if already set in process.env
+          if (Object.prototype.hasOwnProperty.call(process.env, key)) {
+            continue;
+          }
+
+          let value = trimmed.slice(separatorIndex + 1).trim();
+
+          // Handle quotes and escapes
+          if (value.length >= 2) {
+            const firstChar = value[0];
+            const lastChar = value[value.length - 1];
+            if ((firstChar === '"' && lastChar === '"') || (firstChar === "'" && lastChar === "'")) {
+              value = value.slice(1, -1);
+              // Only unescape inside double quotes
+              if (firstChar === '"') {
+                value = value
+                  .replace(/\\n/g, "\n")
+                  .replace(/\\r/g, "\r")
+                  .replace(/\\"/g, '"')
+                  .replace(/\\\\/g, "\\");
+              }
+            }
+          }
+
+          process.env[key] = value;
         }
         
         // 成功したら終了

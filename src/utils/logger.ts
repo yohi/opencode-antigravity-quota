@@ -49,7 +49,7 @@ export async function log(message: string, ...args: unknown[]): Promise<void> {
       }
       if (typeof arg === 'object' && arg !== null) {
         try {
-          return JSON.stringify(arg, Object.getOwnPropertyNames(arg), 2);
+          return JSON.stringify(arg, null, 2);
         } catch {
           return String(arg);
         }
