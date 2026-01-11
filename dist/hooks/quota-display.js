@@ -1,6 +1,7 @@
 import { loadAccounts } from "../core/accounts-reader.js";
 import { parseRateLimits } from "../core/rate-limit-parser.js";
 import { formatCompactQuotaStatus } from "../ui/compact-formatter.js";
+import { fetchQuotaWithCache } from "../api/quota-fetcher.js";
 export function createQuotaDisplayHook(client) {
     return async (input, _output) => {
         try {
@@ -19,7 +20,8 @@ export function createQuotaDisplayHook(client) {
             if (!activeAccount) {
                 return;
             }
-            const quotas = parseRateLimits(activeAccount);
+            const quotas = (await fetchQuotaWithCache(activeAccount)) ??
+                parseRateLimits(activeAccount);
             const formatted = formatCompactQuotaStatus(quotas);
             client.tui.showToast({
                 body: {

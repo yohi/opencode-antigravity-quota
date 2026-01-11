@@ -1,0 +1,17 @@
+import type { ModelFamily, ModelQuotaInfo } from "../core/types.js";
+
+export interface BucketInfo {
+  modelId?: string;
+  remainingFraction?: number;
+  resetTime?: string;
+  tokenType?: string;
+}
+
+export interface RetrieveUserQuotaResponse {
+  buckets?: BucketInfo[];
+}
+
+export interface QuotaCache {
+  data: Map<ModelFamily, ModelQuotaInfo>;
+  timestamp: number;
+}

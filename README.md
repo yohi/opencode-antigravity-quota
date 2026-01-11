@@ -4,9 +4,9 @@ OpenCode TUI plugin to display Antigravity rate limit status after each tool exe
 
 ## Features
 
-- Displays rate limit status for Claude, Gemini Pro, and Gemini Flash models
-- Compact format: `[AG] Claude:✅ | Pro:⏳12m | Flash:✅`
-- Only shows when rate limits are active
+- Displays quota percentage for Claude, Gemini Pro, and Gemini Flash models
+- Compact format: `[AG] Claude:80%🔋 | Pro:35%🔋 | Flash:🪫0%`
+- Falls back to rate limit display if the API fails
 - Reads from `~/.config/opencode/antigravity-accounts.json`
 
 ## Installation
@@ -79,10 +79,13 @@ Add to your config:
 
 | Status | Display |
 |--------|---------|
-| Available | `Model:✅` |
-| Rate Limited | `Model:⏳{time}` |
+| Healthy | `Model:80%🔋` |
+| Low (<=20%) | `Model:15%⚠️` |
+| Empty | `Model:🪫0%` |
+| Rate limited (local) | `Model:⏳{time}` |
+| Unknown (API error) | `Model:??` |
 
-Time format examples:
+Time format examples (rate limited):
 - `12m` - 12 minutes
 - `1h30m` - 1 hour 30 minutes
 - `2h` - 2 hours

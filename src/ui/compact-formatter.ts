@@ -16,16 +16,41 @@ export function formatCompactQuotaStatus(
   for (const family of DISPLAY_ORDER) {
     const info = quotas.get(family);
     const label = FAMILY_DISPLAY_NAMES[family];
-
-    if (!info || info.status === "available") {
-      parts.push(`${label}:✅`);
-    } else {
-      const remaining = formatRemainingTime(info.remainingMs ?? 0);
-      parts.push(`${label}:⏳${remaining}`);
-    }
+    parts.push(`${label}:${formatQuotaIndicator(info)}`);
   }
 
   return `[AG] ${parts.join(" | ")}`;
+}
+
+function formatQuotaIndicator(info?: ModelQuotaInfo): string {
+  if (!info) {
+    return "??";
+  }
+
+  if (info.remainingPercentage !== undefined) {
+    return formatPercentage(info.remainingPercentage);
+  }
+
+  if (info.status === "rate-limited") {
+    const remaining = formatRemainingTime(info.remainingMs ?? 0);
+    return `⏳${remaining}`;
+  }
+
+  return "??";
+}
+
+function formatPercentage(value: number): string {
+  const percentage = Math.round(value);
+
+  if (percentage <= 0) {
+    return "🪫0%";
+  }
+
+  if (percentage <= 20) {
+    return `${percentage}%⚠️`;
+  }
+
+  return `${percentage}%🔋`;
 }
 
 function formatRemainingTime(ms: number): string {

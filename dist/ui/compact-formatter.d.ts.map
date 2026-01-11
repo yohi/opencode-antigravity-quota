@@ -1,1 +1,1 @@
-{"version":3,"file":"compact-formatter.d.ts","sourceRoot":"","sources":["../../src/ui/compact-formatter.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,cAAc,EAAE,WAAW,EAAE,MAAM,kBAAkB,CAAC;AAUpE,wBAAgB,wBAAwB,CACtC,MAAM,EAAE,GAAG,CAAC,WAAW,EAAE,cAAc,CAAC,GACvC,MAAM,CAgBR"}
+{"version":3,"file":"compact-formatter.d.ts","sourceRoot":"","sources":["../../src/ui/compact-formatter.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,cAAc,EAAE,WAAW,EAAE,MAAM,kBAAkB,CAAC;AAUpE,wBAAgB,wBAAwB,CACtC,MAAM,EAAE,GAAG,CAAC,WAAW,EAAE,cAAc,CAAC,GACvC,MAAM,CAUR"}

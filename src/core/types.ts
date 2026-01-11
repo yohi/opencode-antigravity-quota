@@ -6,6 +6,7 @@ export type QuotaStatus = "available" | "rate-limited";
 export interface ModelQuotaInfo {
   family: ModelFamily;
   status: QuotaStatus;
+  remainingPercentage?: number;
   resetTimeMs?: number;
   remainingMs?: number;
 }

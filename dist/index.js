@@ -3,6 +3,7 @@ import { createQuotaDisplayHook } from "./hooks/quota-display.js";
 import { loadAccounts } from "./core/accounts-reader.js";
 import { parseRateLimits } from "./core/rate-limit-parser.js";
 import { formatCompactQuotaStatus } from "./ui/compact-formatter.js";
+import { fetchQuotaWithCache } from "./api/quota-fetcher.js";
 const agStatusTool = tool({
     description: "Show Antigravity quota status for current account",
     args: {},
@@ -17,7 +18,8 @@ const agStatusTool = tool({
             if (!activeAccount) {
                 return "No active account selected.";
             }
-            const quotas = parseRateLimits(activeAccount);
+            const quotas = (await fetchQuotaWithCache(activeAccount)) ??
+                parseRateLimits(activeAccount);
             return formatCompactQuotaStatus(quotas);
         }
         catch (error) {

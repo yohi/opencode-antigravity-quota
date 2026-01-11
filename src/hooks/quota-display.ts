@@ -2,6 +2,7 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { loadAccounts } from "../core/accounts-reader.js";
 import { parseRateLimits } from "../core/rate-limit-parser.js";
 import { formatCompactQuotaStatus } from "../ui/compact-formatter.js";
+import { fetchQuotaWithCache } from "../api/quota-fetcher.js";
 
 interface ToolExecuteInput {
   tool: string;
@@ -42,7 +43,9 @@ export function createQuotaDisplayHook(client: PluginInput["client"]) {
         return;
       }
 
-      const quotas = parseRateLimits(activeAccount);
+      const quotas =
+        (await fetchQuotaWithCache(activeAccount)) ??
+        parseRateLimits(activeAccount);
       const formatted = formatCompactQuotaStatus(quotas);
       client.tui.showToast({
         body: {
