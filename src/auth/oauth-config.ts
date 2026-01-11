@@ -1,17 +1,126 @@
+import { promises as fs, existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { homedir } from "node:os";
+import { fileURLToPath } from "node:url";
+import { log } from "../utils/logger.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 export interface OAuthCredentials {
   clientId: string;
   clientSecret: string;
 }
 
-export function getOAuthCredentials(): OAuthCredentials {
+// 複数の env ファイルパスを優先順位順に定義
+const ENV_FILE_PATHS = (() => {
+  const paths = [
+    // 優先度1: ユーザー設定ディレクトリ (npm パッケージ推奨)
+    join(homedir(), ".config", "opencode", "antigravity-quota.env"),
+    // 優先度2: パッケージ基準 (ローカルクローン/ビルド成果物用)
+    join(__dirname, "../..", ".env"),
+  ];
+
+  // 優先度3: 実行ディレクトリ (条件付き: リポジトリルートと思われる場合のみ)
+  const cwd = process.cwd();
+  if (existsSync(join(cwd, "package.json")) || existsSync(join(cwd, ".git"))) {
+    paths.push(join(cwd, ".env"));
+  }
+
+  return paths;
+})();
+
+let cachedCredentials: OAuthCredentials | null = null;
+let loadPromise: Promise<void> | null = null;
+
+async function loadEnvFile(): Promise<void> {
+  if (loadPromise) {
+    return loadPromise;
+  }
+
+  loadPromise = (async () => {
+    // 各パスを優先順位順に試行
+    for (const envPath of ENV_FILE_PATHS) {
+      try {
+        const content = await fs.readFile(envPath, "utf-8");
+        const lines = content.split("\n");
+        
+        for (const line of lines) {
+          let trimmed = line.trim();
+          if (!trimmed || trimmed.startsWith("#")) {
+            continue;
+          }
+
+          // Handle "export " prefix common in shell scripts
+          if (trimmed.startsWith("export ")) {
+            trimmed = trimmed.slice(7).trim();
+          }
+
+          const separatorIndex = trimmed.indexOf("=");
+          if (separatorIndex === -1) continue;
+
+          const key = trimmed.slice(0, separatorIndex).trim();
+          if (!key) continue;
+
+          // Do not overwrite if already set in process.env
+          if (Object.prototype.hasOwnProperty.call(process.env, key)) {
+            continue;
+          }
+
+          let value = trimmed.slice(separatorIndex + 1).trim();
+
+          // Handle quotes and escapes
+          if (value.length >= 2) {
+            const firstChar = value[0];
+            const lastChar = value[value.length - 1];
+            if ((firstChar === '"' && lastChar === '"') || (firstChar === "'" && lastChar === "'")) {
+              value = value.slice(1, -1);
+              // Only unescape inside double quotes
+              if (firstChar === '"') {
+                value = value
+                  .replace(/\\n/g, "\n")
+                  .replace(/\\r/g, "\r")
+                  .replace(/\\"/g, '"')
+                  .replace(/\\\\/g, "\\");
+              }
+            }
+          }
+
+          process.env[key] = value;
+        }
+        
+        // 成功したら終了
+        return;
+      } catch (error) {
+        // ENOENT (file not found) is expected, log other errors
+        if ((error as any).code !== "ENOENT") {
+          await log(`Error reading env file at ${envPath}:`, error);
+        }
+        // このパスが失敗したら次のパスを試す
+        continue;
+      }
+    }
+  })();
+
+  return loadPromise;
+}
+
+export async function getOAuthCredentials(): Promise<OAuthCredentials> {
+  if (cachedCredentials) {
+    return cachedCredentials;
+  }
+
+  await loadEnvFile();
+
   const clientId = process.env.OAUTH_CLIENT_ID;
   const clientSecret = process.env.OAUTH_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
+    const pathsMessage = ENV_FILE_PATHS.map((p) => `- ${p}`).join("\n");
     throw new Error(
-      "OAuth credentials not found. Please set OAUTH_CLIENT_ID and OAUTH_CLIENT_SECRET environment variables."
+      `OAuth credentials not found. Please create one of these files with OAUTH_CLIENT_ID and OAUTH_CLIENT_SECRET:\n${pathsMessage}`
     );
   }
 
-  return { clientId, clientSecret };
+  cachedCredentials = { clientId, clientSecret };
+  return cachedCredentials;
 }

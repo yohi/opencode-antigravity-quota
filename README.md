@@ -152,31 +152,70 @@ Time format examples (rate limited):
 
 Claude など API 由来の正確なクォータ表示には OAuth 認証が必要です。
 
-1. **Get OAuth credentials** from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-   - Create or use an existing OAuth 2.0 Client ID
-   - Download the credentials or copy `client_id` and `client_secret`
+#### 1. OAuth認証情報を取得
 
-2. **Create `.env` file** in the project root:
-   ```bash
-   cp .env.example .env
-   ```
+[Google Cloud Console](https://console.cloud.google.com/apis/credentials) から OAuth 2.0 Client ID を作成または既存のものを使用:
+- OAuth 2.0 Client ID を作成
+- `client_id` と `client_secret` をコピー
 
-3. **Add your credentials** to `.env`:
-   ```bash
-   OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
-   OAUTH_CLIENT_SECRET=your-client-secret
-   ```
+#### 2. 環境変数ファイルを作成
 
-4. **Run authentication**:
-   ```bash
-   # In OpenCode
-   ag-login
-   ```
+プラグインは以下の場所から環境変数ファイルを優先順位順に読み込みます:
 
-5. 表示されたURLをブラウザで開く
-6. `localhost:11451` のコールバックが完了すると認証完了
+1. `~/.config/opencode/antigravity-quota.env` (推奨 - すべてのインストール方法で使用可能)
+2. プロジェクトディレクトリの `.env` (ローカルクローンの場合)
+
+**推奨**: どのインストール方法でも `~/.config/opencode/antigravity-quota.env` を使用してください。
+
+```bash
+nano ~/.config/opencode/antigravity-quota.env
+```
+
+**ローカルクローンの場合の代替方法**:
+```bash
+cd ~/.config/opencode/opencode-antigravity-quota
+cp .env.example .env
+nano .env
+```
+
+#### 3. OAuth認証情報を記述
+
+ファイルに以下の内容を記述:
+```bash
+OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
+OAUTH_CLIENT_SECRET=your-client-secret
+```
+
+#### 4. 認証を実行
+
+OpenCodeで以下のコマンドを実行:
+```bash
+ag-login
+```
+
+1. 表示されたURLをブラウザで開く
+2. Googleアカウントで認証
+3. `localhost:11451` のコールバックが完了すると認証完了
 
 認証情報は `~/.config/opencode/antigravity-auth.json` に保存されます。
+
+#### トラブルシューティング
+
+##### エラー: "OAuth credentials not found"
+
+環境変数ファイルが以下のいずれかの場所にあるか確認:
+1. `~/.config/opencode/antigravity-quota.env` (推奨)
+2. プロジェクトディレクトリの `.env` (ローカルクローンの場合)
+
+ファイル内容の形式が正しいか確認:
+```bash
+# 正しい形式
+OAUTH_CLIENT_ID=123456.apps.googleusercontent.com
+OAUTH_CLIENT_SECRET=GOCSPX-abc123
+
+# 間違った形式(クォートは不要)
+OAUTH_CLIENT_ID="123456.apps.googleusercontent.com"
+```
 
 ## Requirements
 

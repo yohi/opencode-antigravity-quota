@@ -39,7 +39,7 @@ interface UserInfoResponse {
 
 export async function runOAuthFlow(): Promise<StoredCredential> {
   const state = randomBytes(16).toString("hex");
-  const authUrl = buildAuthorizationUrl(state);
+  const authUrl = await buildAuthorizationUrl(state);
 
   console.log("次のURLをブラウザで開いて認証してください:");
   console.log(authUrl);
@@ -64,8 +64,8 @@ export async function runOAuthFlow(): Promise<StoredCredential> {
   return credential;
 }
 
-function buildAuthorizationUrl(state: string): string {
-  const { clientId } = getOAuthCredentials();
+async function buildAuthorizationUrl(state: string): Promise<string> {
+  const { clientId } = await getOAuthCredentials();
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: REDIRECT_URI,
@@ -130,7 +130,7 @@ async function exchangeAuthorizationCode(code: string): Promise<{
   refreshToken: string;
   expiresAt: string;
 }> {
-  const { clientId, clientSecret } = getOAuthCredentials();
+  const { clientId, clientSecret } = await getOAuthCredentials();
   
   const response = await fetch(TOKEN_URL, {
     method: "POST",

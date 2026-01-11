@@ -12,7 +12,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<string> 
     throw new Error("refreshToken がありません。");
   }
 
-  const { clientId, clientSecret } = getOAuthCredentials();
+  const { clientId, clientSecret } = await getOAuthCredentials();
 
   const response = await fetch(TOKEN_URL, {
     method: "POST",
