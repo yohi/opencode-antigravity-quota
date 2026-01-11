@@ -27,9 +27,17 @@ const agStatusTool = tool({
         return "No active account selected.";
       }
 
-      const quotas =
-        (await fetchQuotaWithCache(activeAccount)) ??
-        parseRateLimits(activeAccount);
+      const localQuotas = parseRateLimits(activeAccount);
+      const apiQuotas = await fetchQuotaWithCache(activeAccount);
+
+      // ローカルの情報をベースに、APIから取得できた情報があれば上書きマージする
+      const quotas = new Map(localQuotas);
+      if (apiQuotas) {
+        for (const [family, info] of apiQuotas) {
+          quotas.set(family, info);
+        }
+      }
+
       return formatCompactQuotaStatus(quotas);
     } catch (error) {
       console.error("Failed to retrieve Antigravity quota status", error);
@@ -52,4 +60,3 @@ const AntigravityQuotaPlugin: Plugin = async ({ client }) => {
 };
 
 export default AntigravityQuotaPlugin;
-

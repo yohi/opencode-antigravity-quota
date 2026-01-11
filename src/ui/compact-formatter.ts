@@ -1,4 +1,4 @@
-import type { ModelQuotaInfo, ModelFamily } from "../core/types.js";
+import type { ModelFamily, ModelQuotaInfo } from "../core/types.js";
 
 const FAMILY_DISPLAY_NAMES: Record<ModelFamily, string> = {
   claude: "Claude",
@@ -36,6 +36,10 @@ function formatQuotaIndicator(info?: ModelQuotaInfo): string {
     return `⏳${remaining}`;
   }
 
+  if (info.status === "available") {
+    return "✅";
+  }
+
   return "??";
 }
 
@@ -58,14 +62,14 @@ function formatRemainingTime(ms: number): string {
     return "0m";
   }
 
-  const totalMinutes = Math.ceil(ms / 60000);
+  const minutesTotal = Math.ceil(ms / 60000);
 
-  if (totalMinutes < 60) {
-    return `${totalMinutes}m`;
+  if (minutesTotal < 60) {
+    return `${minutesTotal}m`;
   }
 
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
+  const hours = Math.floor(minutesTotal / 60);
+  const minutes = minutesTotal % 60;
 
   if (minutes === 0) {
     return `${hours}h`;

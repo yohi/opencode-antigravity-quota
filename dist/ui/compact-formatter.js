@@ -24,6 +24,9 @@ function formatQuotaIndicator(info) {
         const remaining = formatRemainingTime(info.remainingMs ?? 0);
         return `⏳${remaining}`;
     }
+    if (info.status === "available") {
+        return "✅";
+    }
     return "??";
 }
 function formatPercentage(value) {
@@ -40,12 +43,12 @@ function formatRemainingTime(ms) {
     if (ms <= 0) {
         return "0m";
     }
-    const totalMinutes = Math.ceil(ms / 60000);
-    if (totalMinutes < 60) {
-        return `${totalMinutes}m`;
+    const minutesTotal = Math.ceil(ms / 60000);
+    if (minutesTotal < 60) {
+        return `${minutesTotal}m`;
     }
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+    const hours = Math.floor(minutesTotal / 60);
+    const minutes = minutesTotal % 60;
     if (minutes === 0) {
         return `${hours}h`;
     }

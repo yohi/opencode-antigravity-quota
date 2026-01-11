@@ -20,8 +20,15 @@ export function createQuotaDisplayHook(client) {
             if (!activeAccount) {
                 return;
             }
-            const quotas = (await fetchQuotaWithCache(activeAccount)) ??
-                parseRateLimits(activeAccount);
+            const localQuotas = parseRateLimits(activeAccount);
+            const apiQuotas = await fetchQuotaWithCache(activeAccount);
+            // ローカルの情報をベースに、APIから取得できた情報があれば上書きマージする
+            const quotas = new Map(localQuotas);
+            if (apiQuotas) {
+                for (const [family, info] of apiQuotas) {
+                    quotas.set(family, info);
+                }
+            }
             const formatted = formatCompactQuotaStatus(quotas);
             client.tui.showToast({
                 body: {

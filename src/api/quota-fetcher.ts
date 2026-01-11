@@ -47,9 +47,8 @@ async function fetchQuotaFromCloudCode(
   const response = await retrieveUserQuota(accessToken, projectId);
 
   const result = new Map<ModelFamily, ModelQuotaInfo>();
-  for (const family of MODEL_FAMILIES) {
-    result.set(family, { family, status: "available" });
-  }
+  // 以前はここで全モデルを available で初期化していたが、
+  // ローカルデータとのマージを考慮して、APIに含まれるモデルのみを返すように変更
 
   const buckets = response.buckets ?? [];
   let hasPercentage = false;
