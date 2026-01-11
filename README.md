@@ -5,7 +5,13 @@ OpenCode TUI plugin to display Antigravity rate limit status after each tool exe
 ## Features
 
 - Displays quota percentage for Claude, Gemini Pro, and Gemini Flash models
-- Compact format: `[AG] Claude:80%🔋 | Pro:35%🔋 | Flash:🪫0%`
+- Compact format:
+  ```
+  [AG]
+  Claude: 80%🔋
+  Pro   : 35%🔋
+  Flash : 🪫0%
+  ```
 - Falls back to rate limit display if the API fails
 - Reads from `~/.config/opencode/antigravity-accounts.json`
 
@@ -76,6 +82,14 @@ Add to your config:
 ```
 
 ## Display Format
+
+Example output:
+```
+[AG]
+Claude: 80%🔋(↻12m)
+Pro   : 35%🔋
+Flash : ⏳12m
+```
 
 | Status | Display |
 |--------|---------|

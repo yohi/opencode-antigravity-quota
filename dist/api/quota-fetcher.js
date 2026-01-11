@@ -54,10 +54,12 @@ async function fetchQuotaFromCloudCode(account) {
             continue;
         }
         const remainingPercentage = remainingFraction * 100;
+        const resetInfo = resolveResetTime(bucket.resetTime);
         result.set(family, {
             family,
             status: remainingPercentage <= 0 ? "rate-limited" : "available",
             remainingPercentage,
+            ...resetInfo,
         });
         hasPercentage = true;
     }
@@ -95,13 +97,30 @@ function extractQuotaFromAvailableModels(response) {
             continue;
         }
         const remainingPercentage = remainingFraction * 100;
+        const resetInfo = resolveResetTime(info.quotaInfo?.resetTime);
         result.set(family, {
             family,
             status: remainingPercentage <= 0 ? "rate-limited" : "available",
             remainingPercentage,
+            ...resetInfo,
         });
     }
     return result.size > 0 ? result : null;
+}
+function resolveResetTime(resetTime) {
+    if (!resetTime) {
+        return { resetTimeValid: false };
+    }
+    const parsed = new Date(resetTime);
+    if (Number.isNaN(parsed.getTime())) {
+        return { resetTimeValid: false };
+    }
+    const now = Date.now();
+    return {
+        resetTime: parsed,
+        timeUntilResetMs: Math.max(0, parsed.getTime() - now),
+        resetTimeValid: true,
+    };
 }
 function resolveModelFamily(modelId) {
     const lower = modelId.toLowerCase();
