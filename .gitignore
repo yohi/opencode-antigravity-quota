@@ -4,3 +4,8 @@ node_modules/
 
 .serena
 temp_henrik/
+
+# Environment variables
+.env
+.env.local
+.env.*.local

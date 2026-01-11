@@ -92,11 +92,44 @@ Time format examples (rate limited):
 
 ## Authentication
 
+### ⚠️ Security Warning
+
+**The OAuth client secret was previously hardcoded in this repository and has been exposed.**
+
+**Required Actions:**
+1. **Rotate the secret** in [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new OAuth 2.0 Client ID or regenerate the secret
+3. Set up environment variables (see below)
+
+**Never commit `.env` files containing secrets to version control.**
+
+### Setup OAuth Credentials
+
 Claude など API 由来の正確なクォータ表示には OAuth 認証が必要です。
 
-1. OpenCode で `ag-login` を実行
-2. 表示されたURLをブラウザで開く
-3. `localhost:11451` のコールバックが完了すると認証完了
+1. **Get OAuth credentials** from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - Create or use an existing OAuth 2.0 Client ID
+   - Download the credentials or copy `client_id` and `client_secret`
+
+2. **Create `.env` file** in the project root:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Add your credentials** to `.env`:
+   ```bash
+   OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
+   OAUTH_CLIENT_SECRET=your-client-secret
+   ```
+
+4. **Run authentication**:
+   ```bash
+   # In OpenCode
+   ag-login
+   ```
+
+5. 表示されたURLをブラウザで開く
+6. `localhost:11451` のコールバックが完了すると認証完了
 
 認証情報は `~/.config/opencode/antigravity-auth.json` に保存されます。
 

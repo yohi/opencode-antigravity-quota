@@ -2,14 +2,12 @@ import http from "node:http";
 import { URL } from "node:url";
 import { randomBytes } from "node:crypto";
 import { saveStoredCredential, type StoredCredential } from "./token-storage.js";
+import { getOAuthCredentials } from "./oauth-config.js";
 
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const CLOUDCODE_BASE_URL = "https://cloudcode-pa.googleapis.com";
 const USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
 
-const CLIENT_ID =
-  "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
 const SCOPES = [
   "https://www.googleapis.com/auth/cloud-platform",
   "https://www.googleapis.com/auth/userinfo.email",
@@ -67,8 +65,9 @@ export async function runOAuthFlow(): Promise<StoredCredential> {
 }
 
 function buildAuthorizationUrl(state: string): string {
+  const { clientId } = getOAuthCredentials();
   const params = new URLSearchParams({
-    client_id: CLIENT_ID,
+    client_id: clientId,
     redirect_uri: REDIRECT_URI,
     response_type: "code",
     scope: SCOPES.join(" "),
@@ -131,14 +130,16 @@ async function exchangeAuthorizationCode(code: string): Promise<{
   refreshToken: string;
   expiresAt: string;
 }> {
+  const { clientId, clientSecret } = getOAuthCredentials();
+  
   const response = await fetch(TOKEN_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+      client_id: clientId,
+      client_secret: clientSecret,
       code,
       redirect_uri: REDIRECT_URI,
       grant_type: "authorization_code",
