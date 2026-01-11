@@ -17,7 +17,32 @@ OpenCode TUI plugin to display Antigravity rate limit status after each tool exe
 
 ## Installation
 
-The repository includes pre-built files in `dist/`, so **no build step is required** for any installation method.
+The repository does not commit `dist/`. When installing from source, run `npm ci` and `npm run build`.
+
+### Option 0: GitHub Packages (npm)
+
+Configure `~/.npmrc` with a token that has `read:packages`:
+
+```
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+@yohi:registry=https://npm.pkg.github.com
+```
+
+Install and add to OpenCode:
+
+```bash
+npm install @yohi/opencode-antigravity-quota
+```
+
+```json
+{
+  "plugin": [
+    "oh-my-opencode",
+    "opencode-antigravity-auth@beta",
+    "@yohi/opencode-antigravity-quota"
+  ]
+}
+```
 
 ### Option 1: Local Clone with file:// (Recommended)
 
@@ -25,6 +50,9 @@ Clone to your OpenCode config directory:
 
 ```bash
 git clone https://github.com/yohi/opencode-antigravity-quota ~/.config/opencode/opencode-antigravity-quota
+cd ~/.config/opencode/opencode-antigravity-quota
+npm ci
+npm run build
 ```
 
 Add to your `~/.config/opencode/opencode.jsonc`:
@@ -54,7 +82,7 @@ Add to your config:
   "plugin": [
     "oh-my-opencode",
     "opencode-antigravity-auth@beta",
-    "opencode-antigravity-quota@git+https://github.com/yohi/opencode-antigravity-quota"
+    "@yohi/opencode-antigravity-quota@git+https://github.com/yohi/opencode-antigravity-quota"
   ]
 }
 ```
@@ -67,6 +95,9 @@ Clone to any location:
 
 ```bash
 git clone https://github.com/yohi/opencode-antigravity-quota /path/to/opencode-antigravity-quota
+cd /path/to/opencode-antigravity-quota
+npm ci
+npm run build
 ```
 
 Add to your config:

@@ -5,6 +5,8 @@ node_modules/
 .serena
 temp_henrik/
 
+dist/
+
 # Environment variables
 .env
 .env.local

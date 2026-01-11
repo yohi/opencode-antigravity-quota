@@ -1,5 +1,5 @@
 {
-  "name": "opencode-antigravity-quota",
+  "name": "@yohi/opencode-antigravity-quota",
   "version": "0.1.0",
   "type": "module",
   "description": "Display Antigravity rate limit status after each tool execution in OpenCode TUI",
@@ -29,5 +29,13 @@
     "rate-limit"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yohi/opencode-antigravity-quota.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
 }
