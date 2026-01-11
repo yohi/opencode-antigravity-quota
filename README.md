@@ -23,7 +23,7 @@ The repository does not commit `dist/`. When installing from source, run `npm ci
 
 Configure `~/.npmrc` with a token that has `read:packages`:
 
-```
+```ini
 //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
 @yohi:registry=https://npm.pkg.github.com
 ```
