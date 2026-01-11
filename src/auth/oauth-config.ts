@@ -1,4 +1,4 @@
-import { promises as fs } from "node:fs";
+import { promises as fs, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -12,14 +12,22 @@ export interface OAuthCredentials {
 }
 
 // 複数の env ファイルパスを優先順位順に定義
-const ENV_FILE_PATHS = [
-  // 優先度1: ユーザー設定ディレクトリ (npm パッケージ推奨)
-  join(homedir(), ".config", "opencode", "antigravity-quota.env"),
-  // 優先度2: 実行ディレクトリ (ローカル利用で直感的)
-  join(process.cwd(), ".env"),
-  // 優先度3: パッケージ基準 (ローカルクローン/ビルド成果物用)
-  join(__dirname, "../..", ".env"),
-];
+const ENV_FILE_PATHS = (() => {
+  const paths = [
+    // 優先度1: ユーザー設定ディレクトリ (npm パッケージ推奨)
+    join(homedir(), ".config", "opencode", "antigravity-quota.env"),
+    // 優先度2: パッケージ基準 (ローカルクローン/ビルド成果物用)
+    join(__dirname, "../..", ".env"),
+  ];
+
+  // 優先度3: 実行ディレクトリ (条件付き: リポジトリルートと思われる場合のみ)
+  const cwd = process.cwd();
+  if (existsSync(join(cwd, "package.json")) || existsSync(join(cwd, ".git"))) {
+    paths.push(join(cwd, ".env"));
+  }
+
+  return paths;
+})();
 
 let cachedCredentials: OAuthCredentials | null = null;
 let loadPromise: Promise<void> | null = null;

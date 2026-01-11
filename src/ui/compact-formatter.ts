@@ -50,6 +50,11 @@ function formatQuotaIndicator(info?: ModelQuotaInfo): string {
 }
 
 function formatPercentage(value: number): string {
+  // Guard against non-finite numbers (NaN, Infinity)
+  if (!Number.isFinite(value)) {
+    return `🪫  0%`;
+  }
+
   let percentage = Math.round(value);
   // Clamp to 0-100 to avoid confusing display for out-of-range values
   percentage = Math.min(100, Math.max(0, percentage));
