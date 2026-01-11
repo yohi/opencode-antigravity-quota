@@ -3,6 +3,7 @@ import { loadAccounts } from "../core/accounts-reader.js";
 import { parseRateLimits } from "../core/rate-limit-parser.js";
 import { formatCompactQuotaStatus } from "../ui/compact-formatter.js";
 import { fetchQuotaWithCache } from "../api/quota-fetcher.js";
+import { log } from "../utils/logger.js";
 
 interface ToolExecuteInput {
   tool: string;
@@ -61,7 +62,8 @@ export function createQuotaDisplayHook(client: PluginInput["client"]) {
           variant: "info",
         },
       });
-    } catch {
+    } catch (error) {
+      await log("Failed to display quota:", error);
       return;
     }
   };

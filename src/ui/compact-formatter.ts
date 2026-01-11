@@ -42,38 +42,31 @@ function formatQuotaIndicator(info?: ModelQuotaInfo): string {
     return `⏳${remaining}`;
   }
 
-  if (info.status === "available") {
-    return "✅";
-  }
-
   return "??";
 }
 
 function formatPercentage(value: number): string {
   const percentage = Math.round(value);
+  const paddedPercentage = String(percentage).padStart(3);
 
   if (percentage <= 0) {
-    return "🪫0%";
+    return `🪫  0%`;
   }
 
   if (percentage <= 20) {
-    return `${percentage}%⚠️`;
+    return `${paddedPercentage}%⚠️`;
   }
 
-  return `${percentage}%🔋`;
+  return `${paddedPercentage}%🔋`;
 }
 
 function formatResetDisplay(info: ModelQuotaInfo): string {
-  if (info.resetTimeValid === false) {
-    return "(↻??)";
+  if (info.resetTimeValid === true && info.timeUntilResetMs !== undefined) {
+    const remaining = formatRemainingTime(info.timeUntilResetMs);
+    return `(↻${remaining})`;
   }
 
-  if (info.timeUntilResetMs === undefined) {
-    return "(↻??)";
-  }
-
-  const remaining = formatRemainingTime(info.timeUntilResetMs);
-  return `(↻${remaining})`;
+  return "";
 }
 
 function shouldEmphasizeEmpty(value: number): boolean {
@@ -82,21 +75,21 @@ function shouldEmphasizeEmpty(value: number): boolean {
 
 function formatRemainingTime(ms: number): string {
   if (ms <= 0) {
-    return "0m";
+    return "  0m";
   }
 
   const minutesTotal = Math.ceil(ms / 60000);
 
   if (minutesTotal < 60) {
-    return `${minutesTotal}m`;
+    return `${String(minutesTotal).padStart(3)}m`;
   }
 
   const hours = Math.floor(minutesTotal / 60);
   const minutes = minutesTotal % 60;
 
   if (minutes === 0) {
-    return `${hours}h`;
+    return `${String(hours).padStart(2)}h  `;
   }
 
-  return `${hours}h${minutes}m`;
+  return `${String(hours).padStart(2)}h${String(minutes).padStart(2)}m`;
 }

@@ -7,6 +7,7 @@ import {
   saveStoredCredential,
 } from "../auth/token-storage.js";
 import { FetchAvailableModelsResponse, QuotaCache } from "./types.js";
+import { log } from "../utils/logger.js";
 
 
 const CACHE_TTL_MS = 30_000;
@@ -23,7 +24,8 @@ export async function fetchQuotaWithCache(
   let quotas: Map<ModelFamily, ModelQuotaInfo> | null = null;
   try {
     quotas = await fetchQuotaFromCloudCode(account);
-  } catch {
+  } catch (error) {
+    await log("Failed to fetch quota from API:", error);
     return null;
   }
 
@@ -42,28 +44,44 @@ export async function fetchQuotaWithCache(
 async function fetchQuotaFromCloudCode(
   account: AccountData
 ): Promise<Map<ModelFamily, ModelQuotaInfo> | null> {
+  await log("fetchQuotaFromCloudCode started");
   const storedCredential = await loadStoredCredential();
+  await log("loadStoredCredential result:", storedCredential ? "exists" : "null");
   const userAccessToken = await resolveAccessToken(storedCredential);
+  await log("resolveAccessToken result:", userAccessToken ? "exists" : "null");
 
   if (userAccessToken) {
     const projectId = storedCredential?.projectId;
-    const response = await fetchAvailableModels(userAccessToken, projectId);
-    const quotas = extractQuotaFromAvailableModels(response);
-    if (quotas && quotas.size > 0) {
-      return quotas;
+    await log("Trying fetchAvailableModels with projectId:", projectId);
+    try {
+      const response = await fetchAvailableModels(userAccessToken, projectId);
+      await log("fetchAvailableModels response:", response);
+      const quotas = extractQuotaFromAvailableModels(response);
+      if (quotas && quotas.size > 0) {
+        await log("Got quotas from fetchAvailableModels:", quotas.size, "families");
+        return quotas;
+      }
+      await log("fetchAvailableModels returned no quotas");
+    } catch (error) {
+      await log("fetchAvailableModels failed:", error);
     }
   }
 
   if (!account.refreshToken) {
+    await log("No refreshToken in account, cannot fetch quota");
     return null;
   }
 
+  await log("Trying retrieveUserQuota flow");
   const accessToken = await refreshAccessToken(account.refreshToken);
   const projectId = account.managedProjectId ?? account.projectId;
+  await log("Trying retrieveUserQuota with projectId:", projectId);
   const response = await retrieveUserQuota(accessToken, projectId);
+  await log("retrieveUserQuota response:", response);
 
   const result = new Map<ModelFamily, ModelQuotaInfo>();
   const buckets = response.buckets ?? [];
+  await log("retrieveUserQuota returned", buckets.length, "buckets");
   let hasPercentage = false;
 
   for (const bucket of buckets) {
@@ -74,6 +92,7 @@ async function fetchQuotaFromCloudCode(
 
     const remainingFraction = clampFraction(bucket.remainingFraction);
     if (remainingFraction === null) {
+      await log("Skipping bucket with null remainingFraction:", bucket.modelId);
       continue;
     }
 
@@ -88,6 +107,7 @@ async function fetchQuotaFromCloudCode(
     hasPercentage = true;
   }
 
+  await log("Final result has", result.size, "families, hasPercentage:", hasPercentage);
   return hasPercentage ? result : null;
 }
 
