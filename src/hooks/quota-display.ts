@@ -55,7 +55,7 @@ export function createQuotaDisplayHook(client: PluginInput["client"]) {
         }
       }
 
-      const formatted = formatCompactQuotaStatus(quotas);
+      const formatted = formatCompactQuotaStatus(quotas, activeAccount?.email);
       client.tui.showToast({
         body: {
           message: formatted,
