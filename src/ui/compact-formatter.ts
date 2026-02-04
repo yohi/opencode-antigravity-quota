@@ -9,7 +9,8 @@ const FAMILY_DISPLAY_NAMES: Record<ModelFamily, string> = {
 const DISPLAY_ORDER: ModelFamily[] = ["claude", "gemini-pro", "gemini-flash"];
 
 export function formatCompactQuotaStatus(
-  quotas: Map<ModelFamily, ModelQuotaInfo>
+  quotas: Map<ModelFamily, ModelQuotaInfo>,
+  email?: string
 ): string {
   const parts: string[] = [];
   const maxLabelLength = Math.max(
@@ -22,7 +23,8 @@ export function formatCompactQuotaStatus(
     parts.push(`${label}: ${formatQuotaIndicator(info)}`);
   }
 
-  return `[AG]\n${parts.join("\n")}`;
+  const tag = email ? `[AG ${email}]` : "[AG]";
+  return `${tag}\n${parts.join("\n")}`;
 }
 
 function formatQuotaIndicator(info?: ModelQuotaInfo): string {

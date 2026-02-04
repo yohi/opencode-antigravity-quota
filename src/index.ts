@@ -39,7 +39,7 @@ const agStatusTool = tool({
         }
       }
 
-      return formatCompactQuotaStatus(quotas);
+      return formatCompactQuotaStatus(quotas, activeAccount?.email);
     } catch (error) {
       console.error("Failed to retrieve Antigravity quota status", error);
       const errorDetail =
