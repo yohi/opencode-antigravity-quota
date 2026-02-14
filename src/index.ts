@@ -10,7 +10,7 @@ import { runOAuthFlow } from "./auth/oauth-flow.js";
 type EmptyArgs = Record<string, never>;
 
 const agStatusTool = tool({
-  description: "Show Antigravity quota status for current account",
+  description: "Check Antigravity quota status for the current account (Alias: /ag-status)",
   args: {},
   execute: async (_args: EmptyArgs, _context: ToolContext) => {
     try {
@@ -50,7 +50,7 @@ const agStatusTool = tool({
 });
 
 const agLoginTool = tool({
-  description: "Authenticate with Antigravity to fetch quota details",
+  description: "Manually authenticate Antigravity for troubleshooting (Alias: /ag-login)",
   args: {},
   execute: async (_args: EmptyArgs, _context: ToolContext) => {
     try {
