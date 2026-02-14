@@ -137,83 +137,64 @@ Time format examples (rate limited):
 
 ## Authentication
 
-### ⚠️ Security Warning
+### Basic Setup (Zero Configuration)
 
-**The OAuth client secret was previously hardcoded in this repository and has been exposed.**
+Usually, no additional configuration is required. This plugin automatically uses the authentication information from `opencode-antigravity-auth` (stored in `~/.config/opencode/antigravity-accounts.json`).
 
-**Required Actions:**
-1. **Rotate the secret** in [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-2. Create a new OAuth 2.0 Client ID or regenerate the secret
-3. Set up environment variables (see below)
+Just install the plugin and it works!
 
-**Never commit `.env` files containing secrets to version control.**
+### Advanced Setup: Precise Quota Monitoring
 
-### Setup OAuth Credentials
+To display accurate quota usage (especially for Claude) directly from the Google Cloud API, you need to set up OAuth credentials. Without this, the plugin may rely on local estimation or partial data.
 
-Claude など API 由来の正確なクォータ表示には OAuth 認証が必要です。
+#### 1. Setup OAuth Credentials
 
-#### 1. OAuth認証情報を取得
+Create an OAuth 2.0 Client ID in [Google Cloud Console](https://console.cloud.google.com/apis/credentials):
+- Create OAuth 2.0 Client ID
+- Copy `client_id` and `client_secret`
 
-[Google Cloud Console](https://console.cloud.google.com/apis/credentials) から OAuth 2.0 Client ID を作成または既存のものを使用:
-- OAuth 2.0 Client ID を作成
-- `client_id` と `client_secret` をコピー
+#### 2. Create Environment File
 
-#### 2. 環境変数ファイルを作成
-
-プラグインは以下の場所から環境変数ファイルを優先順位順に読み込みます:
-
-1. `~/.config/opencode/antigravity-quota.env` (推奨 - すべてのインストール方法で使用可能)
-2. プロジェクトディレクトリの `.env` (ローカルクローンの場合)
-
-**推奨**: どのインストール方法でも `~/.config/opencode/antigravity-quota.env` を使用してください。
+Create `~/.config/opencode/antigravity-quota.env` (Recommended):
 
 ```bash
 nano ~/.config/opencode/antigravity-quota.env
 ```
 
-**ローカルクローンの場合の代替方法**:
-```bash
-cd ~/.config/opencode/opencode-antigravity-quota
-cp .env.example .env
-nano .env
-```
-
-#### 3. OAuth認証情報を記述
-
-ファイルに以下の内容を記述:
+Add your credentials:
 ```bash
 OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
 OAUTH_CLIENT_SECRET=your-client-secret
 ```
 
-#### 4. 認証を実行
+The plugin will automatically pick up these credentials and use your existing authentication token to fetch precise quota details.
 
-OpenCodeで以下のコマンドを実行:
+### Troubleshooting / Manual Login (`ag-login`)
+
+If you experience authentication issues or want to force a specific account for quota checking, you can use the manual login command.
+
+**Note:** This is usually **not required**.
+
 ```bash
 ag-login
 ```
 
-1. 表示されたURLをブラウザで開く
-2. Googleアカウントで認証
-3. `localhost:11451` のコールバックが完了すると認証完了
+1. Open the displayed URL in your browser.
+2. Authenticate with your Google account.
+3. Wait for the callback at `localhost:11451`.
 
-認証情報は `~/.config/opencode/antigravity-auth.json` に保存されます。
+This will generate `~/.config/opencode/antigravity-auth.json`, which takes precedence over the default account settings.
 
-#### トラブルシューティング
+#### "OAuth credentials not found" Error
 
-##### エラー: "OAuth credentials not found"
+Check if the environment file exists at `~/.config/opencode/antigravity-quota.env` and has the correct format:
 
-環境変数ファイルが以下のいずれかの場所にあるか確認:
-1. `~/.config/opencode/antigravity-quota.env` (推奨)
-2. プロジェクトディレクトリの `.env` (ローカルクローンの場合)
-
-ファイル内容の形式が正しいか確認:
 ```bash
-# 正しい形式
+# Correct
 OAUTH_CLIENT_ID=123456.apps.googleusercontent.com
 OAUTH_CLIENT_SECRET=GOCSPX-abc123
 
-# 間違った形式(クォートは不要)
+# Incorrect (no quotes needed)
 OAUTH_CLIENT_ID="123456.apps.googleusercontent.com"
 ```
 
