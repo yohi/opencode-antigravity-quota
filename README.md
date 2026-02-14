@@ -191,11 +191,11 @@ Check if the environment file exists at `~/.config/opencode/antigravity-quota.en
 
 ```bash
 # Correct
-OAUTH_CLIENT_ID=123456.apps.googleusercontent.com
-OAUTH_CLIENT_SECRET=GOCSPX-abc123
+OAUTH_CLIENT_ID=YOUR_CLIENT_ID_PLACEHOLDER
+OAUTH_CLIENT_SECRET=YOUR_CLIENT_SECRET_PLACEHOLDER
 
 # Incorrect (no quotes needed)
-OAUTH_CLIENT_ID="123456.apps.googleusercontent.com"
+OAUTH_CLIENT_ID="YOUR_CLIENT_ID_PLACEHOLDER"
 ```
 
 ## Requirements
